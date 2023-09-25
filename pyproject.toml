@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "decision-making-app"
+version = "0.1.0"
+description = ""
+authors = ["hrimov <andrew.hrimov@gmail.com>"]
+readme = "README.md"
+packages = [
+    { include = "app", from = "src" }
+]
+
+[tool.poetry.scripts]
+api = "src.app.__main__:run"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.103.1"
+uvicorn = { extras = ["standard"], version = "^0.23.2" }
+sqlalchemy = { extras = ["async"], version = "^2.0.21" }
+alembic = "^1.12.0"
+orjson = "^3.9.7"
+
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.2"
+pytest-asyncio = "^0.21.1"
+
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^6.1.0"
+isort = "^5.12.0"
+mypy = "^1.5.1"
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

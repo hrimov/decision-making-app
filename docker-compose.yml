@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  api:
+    profiles: [ "api" ]
+    container_name: decision_making_app.api
+    build:
+      context: .
+    restart: unless-stopped
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - decision_making_app.postgres.network
+    volumes:
+      - ./config:/decision_making_app/config:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/local.ini}
+    command: [ "python", "-Om", "src.app" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck/" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  postgres:
+    profiles: [ "api", "migration" ]
+    container_name: decision_making_app.postgres
+    image: "postgres:15-alpine"
+    hostname: decision_making_app.postgres
+    restart: unless-stopped
+    expose:
+      - "5432"
+    ports:
+      - "127.0.0.1:15432:5432"
+    networks:
+      - decision_making_app.postgres.network
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-decision_making_app}
+    volumes:
+      - decision_making_app.postgres.data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DATABASE} -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  postgres_migration:
+    profiles: [ "migration" ]
+    container_name: decision_making_app.postgres_migration
+    build:
+      context: .
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - decision_making_app.postgres.network
+    volumes:
+      - ./config:/decision_making_app/config:ro
+      - ./alembic.ini:/decision_making_app/alembic.ini:ro
+      - ./src/app/infrastructure/database/migrations:/decision_making_app/src/app/infrastructure/database/migrations:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/local.ini}
+    command: [ "python", "-m", "alembic", "upgrade", "head" ]
+
+
+volumes:
+  decision_making_app.postgres.data:
+
+networks:
+  decision_making_app.postgres.network:
