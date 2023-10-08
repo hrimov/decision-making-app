@@ -12,14 +12,21 @@ services:
     ports:
       - "5000:5000"
     depends_on:
+# TODO: fix healthcheck for minio
+#      minio:
+#        condition: service_healthy
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
+      - decision_making_app.minio.network
       - decision_making_app.postgres.network
+      - decision_making_app.rabbitmq.network
     volumes:
       - ./config:/decision_making_app/config:ro
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-./config/local.ini}
+      CONFIG_PATH: ${CONFIG_PATH:-./config/local.ini}
     command: [ "python", "-Om", "src.app" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck/" ]
@@ -31,8 +38,8 @@ services:
   postgres:
     profiles: [ "api", "migration" ]
     container_name: decision_making_app.postgres
-    image: "postgres:15-alpine"
     hostname: decision_making_app.postgres
+    image: "postgres:15-alpine"
     restart: unless-stopped
     expose:
       - "5432"
@@ -41,13 +48,13 @@ services:
     networks:
       - decision_making_app.postgres.network
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
-      POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-decision_making_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-decision_making_app_admin}
+      POSTGRES_USER: ${POSTGRES_USER:-decision_making_app_admin}
+      POSTGRES_DB: ${POSTGRES_DB:-decision_making_app}
     volumes:
       - decision_making_app.postgres.data:/var/lib/postgresql/data:rw
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DATABASE} -U $${POSTGRES_USER}" ]
+      test: [ "CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER" ]
       interval: 10s
       timeout: 60s
       retries: 5
@@ -69,12 +76,66 @@ services:
       - ./alembic.ini:/decision_making_app/alembic.ini:ro
       - ./src/app/infrastructure/database/migrations:/decision_making_app/src/app/infrastructure/database/migrations:ro
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-./config/local.ini}
+      CONFIG_PATH: ${CONFIG_PATH:-./config/local.ini}
     command: [ "python", "-m", "alembic", "upgrade", "head" ]
+
+  minio:
+    profiles: [ "api" ]
+    container_name: decision_making_app.minio
+    image: "quay.io/minio/minio"
+    command: [ "server", "--address", ":9000", "--console-address", ":9001", "/data" ]
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - decision_making_app.minio.network
+    volumes:
+      - decision_making_app.minio.data:/data:rw
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-decision_making_app_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-decision_making_app_admin}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl", "-fsSL", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  rabbitmq:
+    profiles: [ "api" ]
+    image: rabbitmq:3.11-management-alpine
+    container_name: decision_making_app.rabbitmq
+    hostname: decision_making_app.rabbitmq
+    restart: unless-stopped
+    expose:
+      # AMQP protocol port
+      - "5672"
+      # HTTP management UI
+      - "15672"
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    networks:
+      - decision_making_app.rabbitmq.network
+    volumes:
+      - decision_making_app.rabbitmq.data:/var/lib/rabbitmq/:rw
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-decision_making_app_admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-decision_making_app_admin}
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics check_running -q" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
 
 
 volumes:
+  decision_making_app.minio.data:
   decision_making_app.postgres.data:
+  decision_making_app.rabbitmq.data:
 
 networks:
+  decision_making_app.minio.network:
   decision_making_app.postgres.network:
+  decision_making_app.rabbitmq.network:
