@@ -13,8 +13,8 @@ services:
       - "5000:5000"
     depends_on:
 # TODO: fix healthcheck for minio
-#      minio:
-#        condition: service_healthy
+      minio:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       rabbitmq:
@@ -95,7 +95,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-decision_making_app_admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-decision_making_app_admin}
     healthcheck:
-      test: [ "CMD-SHELL", "curl", "-fsSL", "http://localhost:9000/minio/health/live" ]
+      test: [ "CMD-SHELL", "curl -I http://localhost:9000/minio/health/live" ]
       interval: 10s
       timeout: 60s
       retries: 5
