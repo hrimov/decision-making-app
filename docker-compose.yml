@@ -12,7 +12,6 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-# TODO: fix healthcheck for minio
       minio:
         condition: service_healthy
       postgres:
@@ -108,10 +107,8 @@ services:
     hostname: decision_making_app.rabbitmq
     restart: unless-stopped
     expose:
-      # AMQP protocol port
-      - "5672"
-      # HTTP management UI
-      - "15672"
+      - "5672"  # AMQP port
+      - "15672"  # HTTP management UI dashboard port
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -129,13 +126,72 @@ services:
       retries: 5
       start_period: 10s
 
+  grafana:
+    profiles: [ "grafana" ]
+    image: grafana/grafana:9.5.2
+    container_name: decision_making_app.grafana
+    hostname: decision_making_app.grafana
+    restart: unless-stopped
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - decision_making_app.grafana.network
+    volumes:
+      - decision_making_app.grafana.data:/var/lib/grafana:rw
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-decision_making_app_admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-decision_making_app_admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - VIRTUAL_HOST=decision_making_app.grafana
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_PORT=3000
+
+  loki:
+    profiles: [ "grafana" ]
+    image: grafana/loki:2.8.2
+    container_name: decision_making_app.loki
+    hostname: decision_making_app.loki
+    expose:
+      - "3100"
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - decision_making_app.loki.data:/tmp/:rw
+    command: -config.file=/etc/loki/config.yaml
+    restart: unless-stopped
+    networks:
+      - decision_making_app.grafana.network
+
+  vector:
+    profiles: [ "grafana" ]
+    image: timberio/vector:0.29.1-alpine
+    container_name: decision_making_app.vector
+    hostname: decision_making_app.vector
+    restart: unless-stopped
+    expose:
+      - "8383"
+    networks:
+      - decision_making_app.grafana.network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
 
 volumes:
   decision_making_app.minio.data:
   decision_making_app.postgres.data:
   decision_making_app.rabbitmq.data:
+  decision_making_app.grafana.data:
+  decision_making_app.loki.data:
 
 networks:
   decision_making_app.minio.network:
   decision_making_app.postgres.network:
   decision_making_app.rabbitmq.network:
+  decision_making_app.grafana.network:
