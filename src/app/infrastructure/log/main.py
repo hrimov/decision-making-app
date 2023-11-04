@@ -1,7 +1,7 @@
 import logging
 
-from src.app.infrastucture.config.models.application import AppConfig
-from src.app.infrastucture.log.formatters import MainConsoleFormatter
+from src.app.infrastructure.config.models.application import AppConfig
+from src.app.infrastructure.log.formatters import MainConsoleFormatter
 
 
 DEFAULT_LOGGING_LEVEL: int = logging.INFO

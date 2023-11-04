@@ -1,0 +1,16 @@
+[sources.docker]
+type = "docker_logs"
+docker_host = "/var/run/docker.sock"
+include_containers = ["decision_making_app.api"]
+
+[sinks.console]
+type = "console"
+inputs = ["docker"]
+encoding.codec = "text"
+
+[sinks.loki_sync_id]
+type = "loki"
+inputs = ["docker"]
+encoding.codec = "text"
+labels.event = "log"
+endpoint = "http://decision_making_app.loki:3100"
