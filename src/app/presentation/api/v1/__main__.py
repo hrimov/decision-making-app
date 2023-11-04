@@ -3,9 +3,9 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 
-from src.app.infrastucture.config.models import AppConfig, Config
-from src.app.infrastucture.config.parsers.main import load_config
-from src.app.infrastucture.log.main import configure_logging
+from src.app.infrastructure.config.models import AppConfig, Config
+from src.app.infrastructure.config.parsers.main import load_config
+from src.app.infrastructure.log.main import configure_logging
 from src.app.presentation.api.v1 import controllers, middlewares, providers
 from src.app.presentation.api.v1.factory import create_fastapi_app
 
