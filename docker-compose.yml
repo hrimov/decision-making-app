@@ -169,6 +169,10 @@ services:
     image: timberio/vector:0.29.1-alpine
     container_name: decision_making_app.vector
     hostname: decision_making_app.vector
+    depends_on:
+      loki:
+        condition: service_started
+    command: --config /etc/vector/vector.toml
     restart: unless-stopped
     expose:
       - "8383"
@@ -177,11 +181,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./vector/vector.toml:/etc/vector/vector.toml:ro
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-
 
 volumes:
   decision_making_app.minio.data:
