@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import func, MetaData
+from sqlalchemy import func, MetaData, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, registry
 
 
@@ -35,3 +35,17 @@ class CreatedUpdatedAtMixin(BaseModel):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class StartedEndsAtMixin(BaseModel):
+    """
+    A model mixin that adds `started_at` and `ends_at` timestamp fields
+    """
+    __abstract__ = True
+
+    started_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now()
+    )
+    ends_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
