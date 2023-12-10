@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster as python-base
+FROM python:3.11 as python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -16,7 +16,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 FROM python-base as builder-base
 
 RUN apt-get update \
- && apt-get install -y gcc git
+ && apt-get install -y gcc git libpq-dev
 
 WORKDIR $PYSETUP_PATH
 
