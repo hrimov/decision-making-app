@@ -9,18 +9,19 @@ from .base import BaseModel, CreatedUpdatedAtMixin
 
 if TYPE_CHECKING:
     from .user import User
-    from .stages import ProblemStatement, SuggestionStage, VotingStage, Suggestion
+    from .stage import ProblemStatement, SuggestionStage, VotingStage, Suggestion
     from .problem_member import ProblemMember
 
 
 class Problem(CreatedUpdatedAtMixin):
-    __tablename__ = "problem"
+    __tablename__ = "problems"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(20))
     description: Mapped[str]
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     private: Mapped[bool]
-    state_id: Mapped[int] = mapped_column(ForeignKey("problem_state.id"))
+    state_id: Mapped[int] = mapped_column(ForeignKey("problem_states.id"))
 
     state: Mapped["ProblemState"] = relationship(back_populates="problems")
     creator: Mapped["User"] = relationship(back_populates="created_problems")
@@ -32,7 +33,9 @@ class Problem(CreatedUpdatedAtMixin):
 
 
 class ProblemState(BaseModel):
-    __tablename__ = "problem_state"
+    __tablename__ = "problem_states"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(20))
+
     problems: Mapped[list["Problem"]] = relationship(back_populates="state")

@@ -9,14 +9,15 @@ from .base import BaseModel
 if TYPE_CHECKING:
     from .problem import Problem
     from .user import User
-    from .comments import Comment
+    from .comment import Comment
 
 
 class ProblemMember(BaseModel):
-    __tablename__ = "problem_member"
+    __tablename__ = "problem_members"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    problem_id: Mapped[int] = mapped_column(ForeignKey("problem.id"))
+    problem_id: Mapped[int] = mapped_column(ForeignKey("problems.id"))
 
     user: Mapped["User"] = relationship(back_populates="user")
     problem: Mapped["Problem"] = relationship(back_populates="problem")

@@ -39,7 +39,7 @@ class CreatedUpdatedAtMixin(BaseModel):
 
 class StartedEndsAtMixin(BaseModel):
     """
-    A model mixin that adds `started_at` and `ends_at` timestamp fields
+    A model mixin that adds `started_at` and `ended_at` timestamp fields
     """
     __abstract__ = True
 
@@ -48,4 +48,4 @@ class StartedEndsAtMixin(BaseModel):
         nullable=False,
         server_default=func.now()
     )
-    ends_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 class User(CreatedUpdatedAtMixin):
     __tablename__ = "users"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     nickname: Mapped[str] = mapped_column(String(20))
     fullname: Mapped[str]
