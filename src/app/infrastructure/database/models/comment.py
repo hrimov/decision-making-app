@@ -30,7 +30,7 @@ class ProblemStatementComment(BaseModel):
     problem_statement_id: Mapped[int] = mapped_column(ForeignKey("problem_statements.id"))
     parent_comment_id: Mapped[int] = mapped_column(ForeignKey("problem_statement_comments.id"))
 
-    problem_statement: Mapped["ProblemStatement"] = relationship("comments")
+    problem_statement: Mapped["ProblemStatement"] = relationship(back_populates="comments")
     parent: Mapped["ProblemStatementComment"] = relationship(back_populates="child_comments", remote_side=[id])
     child_comments: Mapped[list["ProblemStatementComment"]] = relationship(back_populates="parent")
 
@@ -42,7 +42,7 @@ class SuggestionComment(BaseModel):
     suggestion_id: Mapped[int] = mapped_column(ForeignKey("suggestions.id"))
     parent_comment_id: Mapped[int] = mapped_column(ForeignKey("suggestion_comments.id"))
 
-    suggestion: Mapped["Suggestion"] = relationship("comments")
+    suggestion: Mapped["Suggestion"] = relationship(back_populates="comments")
     parent: Mapped["SuggestionComment"] = relationship(back_populates="child_comments", remote_side=[id])
     child_comments: Mapped[list["SuggestionComment"]] = relationship(back_populates="parent")
 
@@ -54,6 +54,6 @@ class ResultComment(BaseModel):
     result_id: Mapped[int] = mapped_column(ForeignKey("results.id"))
     parent_comment_id: Mapped[int] = mapped_column(ForeignKey("result_comments.id"))
 
-    result: Mapped["Result"] = relationship("comments")
+    result: Mapped["Result"] = relationship(back_populates="comments")
     parent: Mapped["ResultComment"] = relationship(back_populates="child_comments", remote_side=[id])
     child_comments: Mapped[list["ResultComment"]] = relationship(back_populates="parent")

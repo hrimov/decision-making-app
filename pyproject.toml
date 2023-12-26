@@ -29,6 +29,8 @@ optional = true
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
 pytest-asyncio = "^0.21.1"
+testcontainers = { extras = ["postgresql"], version = "^3.7.1" }
+pytest-order = "^1.2.0"
 
 
 [tool.poetry.group.lint]
@@ -42,6 +44,8 @@ mypy = "^1.5.1"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
 
 
 [build-system]
