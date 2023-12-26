@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column, relationship
 
@@ -20,7 +20,7 @@ class User(CreatedUpdatedAtMixin):
     password: Mapped[str]
     email: Mapped[str]
     photo_path: Mapped[str | None]
-    reputation: Mapped[int]
+    reputation: Mapped[int] = mapped_column(Integer(), default=0)
 
-    problems_created: Mapped[list["Problem"]] = relationship(back_populates="creator")
+    created_problems: Mapped[list["Problem"]] = relationship(back_populates="creator")
     member_of: Mapped[list["ProblemMember"]] = relationship(back_populates="user")

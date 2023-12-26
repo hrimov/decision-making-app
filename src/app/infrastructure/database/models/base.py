@@ -37,7 +37,7 @@ class CreatedUpdatedAtMixin(BaseModel):
     )
 
 
-class StartedEndsAtMixin(BaseModel):
+class StartedEndedAtMixin(BaseModel):
     """
     A model mixin that adds `started_at` and `ended_at` timestamp fields
     """

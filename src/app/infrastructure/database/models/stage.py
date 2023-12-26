@@ -4,7 +4,7 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column, relationship
 
-from .base import BaseModel, StartedEndsAtMixin
+from .base import BaseModel, StartedEndedAtMixin
 
 if TYPE_CHECKING:
     from .problem import Problem
@@ -23,7 +23,7 @@ class ProblemStatement(BaseModel):
     comments: Mapped[list["ProblemStatementComment"]] = relationship(back_populates="problem_statement")
 
 
-class SuggestionStage(StartedEndsAtMixin):
+class SuggestionStage(StartedEndedAtMixin):
     __tablename__ = "suggestion_stages"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -48,7 +48,7 @@ class Suggestion(BaseModel):
     best: Mapped["Result"] = relationship(back_populates="suggestion")
 
 
-class VotingStage(StartedEndsAtMixin):
+class VotingStage(StartedEndedAtMixin):
     __tablename__ = "voting_stages"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -80,7 +80,7 @@ class Result(BaseModel):
     content_path: Mapped[str | None]
 
     suggestion: Mapped["Suggestion"] = relationship(back_populates="best")
-    comments: Mapped[list["ResultComment"]] = relationship("result")
+    comments: Mapped[list["ResultComment"]] = relationship(back_populates="result")
 
 
 
