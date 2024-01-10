@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
-from src.app.application.common.exceptions import GatewayError
+from src.app.application.common.exceptions import DatabaseGatewayError
 
 
-class UserGatewayError(GatewayError):
+class UserDatabaseGatewayError(DatabaseGatewayError):
     pass
 
 
 @dataclass(eq=False)
-class UserIdNotExists(UserGatewayError):
+class UserIdNotExists(UserDatabaseGatewayError):
     id: int
 
     @property
@@ -17,7 +17,7 @@ class UserIdNotExists(UserGatewayError):
 
 
 @dataclass(eq=False)
-class UserNicknameNotExists(UserGatewayError):
+class UserNicknameNotExists(UserDatabaseGatewayError):
     nickname: str
 
     @property

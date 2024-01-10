@@ -8,3 +8,11 @@ class ApplicationException(Exception):
 
 class GatewayError(ApplicationException):
     pass
+
+
+class DatabaseGatewayError(GatewayError):
+    pass
+
+
+class ObjectStorageGatewayError(GatewayError):
+    pass

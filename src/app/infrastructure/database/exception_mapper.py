@@ -4,7 +4,7 @@ from typing import Any, Coroutine, ParamSpec, TypeVar
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.app.application.common.exceptions import GatewayError
+from src.app.application.common.exceptions import DatabaseGatewayError
 
 
 Param = ParamSpec("Param")
@@ -20,6 +20,6 @@ def exception_mapper(
         try:
             return await func(*args, **kwargs)
         except SQLAlchemyError as err:
-            raise GatewayError from err
+            raise DatabaseGatewayError from err
 
     return wrapped

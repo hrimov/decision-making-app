@@ -4,7 +4,7 @@ from sqlalchemy import func, select, Select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from src.app.application.common.pagination import LimitOffsetPagination, LimitOffsetPaginationResult, SortOrder
-from src.app.application.common.exceptions import GatewayError
+from src.app.application.common.exceptions import DatabaseGatewayError
 from src.app.application.user import dto
 from src.app.application.user.exceptions import (
     UserIdNotExists,
@@ -88,7 +88,7 @@ class UserGatewayImpl(SQLAlchemyGateway):
     def _parse_error(self, error: DBAPIError) -> NoReturn:
         match error.orig.diag.constraint_name:  # type: ignore
             case _:
-                raise GatewayError from error
+                raise DatabaseGatewayError from error
 
     # noinspection PyMethodMayBeStatic
     # TODO: implement necessary filters for the User
