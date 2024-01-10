@@ -5,6 +5,7 @@ from src.app.infrastructure.config.models import (
     AppConfig,
     Config,
     DatabaseConfig,
+    ObjectStorageConfig,
 )
 
 
@@ -18,7 +19,9 @@ def load_config(path: str | None = None) -> Config:
     parser = configparser.ConfigParser()
     parser.read(path)
 
-    application_data, database_data = parser["application"], parser["database"]
+    application_data = parser["application"]
+    database_data = parser["database"]
+    object_storage_data = parser["object_storage"]
 
     application_config = AppConfig(
         host=application_data.get("host"),
@@ -33,5 +36,10 @@ def load_config(path: str | None = None) -> Config:
         password=database_data.get("password"),
         echo=database_data.getboolean("echo"),
     )
+    object_storage_config = ObjectStorageConfig(
+        access_key=object_storage_data.get("access_key"),
+        secret_key=object_storage_data.get("secret_key"),
+        bucket_name=object_storage_data.get("bucket_name"),
+    )
 
-    return Config(application_config, database_config)
+    return Config(application_config, database_config, object_storage_config)

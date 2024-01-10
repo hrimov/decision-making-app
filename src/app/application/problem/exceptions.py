@@ -1,22 +1,22 @@
 from dataclasses import dataclass
 
-from src.app.application.common.exceptions import GatewayError
+from src.app.application.common.exceptions import DatabaseGatewayError
 
 
-class ProblemGatewayError(GatewayError):
+class ProblemDatabaseGatewayError(DatabaseGatewayError):
     pass
 
 
-class ProblemMemberGatewayError(GatewayError):
+class ProblemMemberDatabaseGatewayError(DatabaseGatewayError):
     pass
 
 
-class ProblemStateGatewayError(GatewayError):
+class ProblemStateDatabaseGatewayError(DatabaseGatewayError):
     pass
 
 
 @dataclass(eq=False)
-class ProblemIdNotExists(ProblemGatewayError):
+class ProblemIdNotExists(ProblemDatabaseGatewayError):
     id: int
 
     @property
@@ -25,7 +25,7 @@ class ProblemIdNotExists(ProblemGatewayError):
 
 
 @dataclass(eq=False)
-class ProblemStateIdNotExists(ProblemStateGatewayError):
+class ProblemStateIdNotExists(ProblemStateDatabaseGatewayError):
     id: int
 
     @property
@@ -34,7 +34,7 @@ class ProblemStateIdNotExists(ProblemStateGatewayError):
 
 
 @dataclass(eq=False)
-class ProblemStateNameNotExists(ProblemStateGatewayError):
+class ProblemStateNameNotExists(ProblemStateDatabaseGatewayError):
     name: str
 
     @property
