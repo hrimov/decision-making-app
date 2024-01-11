@@ -8,7 +8,7 @@ class UserDatabaseGatewayError(DatabaseGatewayError):
 
 
 @dataclass(eq=False)
-class UserIdNotExists(UserDatabaseGatewayError):
+class UserIdNotExists(UserDatabaseGatewayError):  # noqa: N818
     id: int
 
     @property
@@ -17,7 +17,7 @@ class UserIdNotExists(UserDatabaseGatewayError):
 
 
 @dataclass(eq=False)
-class UserNicknameNotExists(UserDatabaseGatewayError):
+class UserNicknameNotExists(UserDatabaseGatewayError):  # noqa: N818
     nickname: str
 
     @property

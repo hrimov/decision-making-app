@@ -16,7 +16,7 @@ class ProblemStateDatabaseGatewayError(DatabaseGatewayError):
 
 
 @dataclass(eq=False)
-class ProblemIdNotExists(ProblemDatabaseGatewayError):
+class ProblemIdNotExists(ProblemDatabaseGatewayError):  # noqa: N818
     id: int
 
     @property
@@ -25,7 +25,7 @@ class ProblemIdNotExists(ProblemDatabaseGatewayError):
 
 
 @dataclass(eq=False)
-class ProblemStateIdNotExists(ProblemStateDatabaseGatewayError):
+class ProblemStateIdNotExists(ProblemStateDatabaseGatewayError):  # noqa: N818
     id: int
 
     @property
@@ -34,7 +34,7 @@ class ProblemStateIdNotExists(ProblemStateDatabaseGatewayError):
 
 
 @dataclass(eq=False)
-class ProblemStateNameNotExists(ProblemStateDatabaseGatewayError):
+class ProblemStateNameNotExists(ProblemStateDatabaseGatewayError):  # noqa: N818
     name: str
 
     @property

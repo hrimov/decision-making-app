@@ -40,8 +40,17 @@ class LimitOffsetPaginationResult(DTO, PaginationResult):
     total: int
 
     @classmethod
-    def from_pagination(cls, pagination: LimitOffsetPagination, total: int) -> "LimitOffsetPaginationResult":
-        return cls(offset=pagination.offset, limit=pagination.limit, order=pagination.order, total=total)
+    def from_pagination(
+            cls,
+            pagination: LimitOffsetPagination,  # type: ignore[override]
+            total: int,
+    ) -> "LimitOffsetPaginationResult":
+        return cls(
+            offset=pagination.offset,
+            limit=pagination.limit,
+            order=pagination.order,
+            total=total,
+        )
 
 
 @dataclass(frozen=True)

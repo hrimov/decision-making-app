@@ -8,7 +8,7 @@ convention = {
     "ix": "ix_%(column_0_label)s",  # INDEX
     "uq": "uq_%(table_name)s_%(column_0_N_name)s",  # UNIQUE
     "ck": "ck_%(table_name)s_%(constraint_name)s",  # CHECK
-    "fk": "fk_%(table_name)s_%(column_0_N_name)s_%(referred_table_name)s",  # FOREIGN KEY
+    "fk": "fk_%(table_name)s_%(column_0_N_name)s_%(referred_table_name)s",  # FK
     "pk": "pk_%(table_name)s",  # PRIMARY KEY
 }
 
@@ -28,7 +28,7 @@ class CreatedUpdatedAtMixin(BaseModel):
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         nullable=False,
-        server_default=func.now()
+        server_default=func.now(),
     )
     updated_at: Mapped[datetime.datetime] = mapped_column(
         nullable=False,
@@ -46,6 +46,6 @@ class StartedEndedAtMixin(BaseModel):
     started_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        server_default=func.now()
+        server_default=func.now(),
     )
     ended_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))

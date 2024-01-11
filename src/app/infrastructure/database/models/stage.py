@@ -19,8 +19,12 @@ class ProblemStatement(BaseModel):
     content_path: Mapped[str | None]
     problem_id: Mapped[int] = mapped_column(ForeignKey("problems.id"))
 
-    problem: Mapped["Problem"] = relationship(back_populates="problem_statement")
-    comments: Mapped[list["ProblemStatementComment"]] = relationship(back_populates="problem_statement")
+    problem: Mapped["Problem"] = relationship(
+        back_populates="problem_statement",
+    )
+    comments: Mapped[list["ProblemStatementComment"]] = relationship(
+        back_populates="problem_statement",
+    )
 
 
 class SuggestionStage(StartedEndedAtMixin):
@@ -29,7 +33,9 @@ class SuggestionStage(StartedEndedAtMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     problem_id: Mapped[int] = mapped_column(ForeignKey("problems.id"))
 
-    problem: Mapped["Problem"] = relationship(back_populates="suggestion_stage")
+    problem: Mapped["Problem"] = relationship(
+        back_populates="suggestion_stage",
+    )
 
 
 class Suggestion(BaseModel):
@@ -42,10 +48,18 @@ class Suggestion(BaseModel):
     creator_id: Mapped[int] = mapped_column(ForeignKey("problem_members.id"))
     problem_id: Mapped[int] = mapped_column(ForeignKey("problems.id"))
 
-    problem: Mapped["Problem"] = relationship(back_populates="suggestions")
-    suggestion_votes: Mapped[list["SuggestionVote"]] = relationship(back_populates="suggestion")
-    comments: Mapped[list["SuggestionComment"]] = relationship(back_populates="suggestion")
-    best: Mapped["Result"] = relationship(back_populates="suggestion")
+    problem: Mapped["Problem"] = relationship(
+        back_populates="suggestions",
+    )
+    suggestion_votes: Mapped[list["SuggestionVote"]] = relationship(
+        back_populates="suggestion",
+    )
+    comments: Mapped[list["SuggestionComment"]] = relationship(
+        back_populates="suggestion",
+    )
+    best: Mapped["Result"] = relationship(
+        back_populates="suggestion",
+    )
 
 
 class VotingStage(StartedEndedAtMixin):
@@ -54,8 +68,12 @@ class VotingStage(StartedEndedAtMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     problem_id: Mapped[int] = mapped_column(ForeignKey("problems.id"))
 
-    problem: Mapped["Problem"] = relationship(back_populates="voting_stage")
-    suggestions_on_vote: Mapped[list["SuggestionVote"]] = relationship(back_populates="voting")
+    problem: Mapped["Problem"] = relationship(
+        back_populates="voting_stage",
+    )
+    suggestions_on_vote: Mapped[list["SuggestionVote"]] = relationship(
+        back_populates="voting",
+    )
 
 
 class SuggestionVote(BaseModel):
@@ -66,8 +84,12 @@ class SuggestionVote(BaseModel):
     suggestion_id: Mapped[int] = mapped_column(ForeignKey("suggestions.id"))
     voting_id: Mapped[int] = mapped_column(ForeignKey("voting_stages.id"))
 
-    suggestion: Mapped["Suggestion"] = relationship(back_populates="suggestion_votes")
-    voting: Mapped["VotingStage"] = relationship(back_populates="suggestions_on_vote")
+    suggestion: Mapped["Suggestion"] = relationship(
+        back_populates="suggestion_votes",
+    )
+    voting: Mapped["VotingStage"] = relationship(
+        back_populates="suggestions_on_vote",
+    )
 
 
 class Result(BaseModel):
@@ -79,8 +101,9 @@ class Result(BaseModel):
     decision: Mapped[str]
     content_path: Mapped[str | None]
 
-    suggestion: Mapped["Suggestion"] = relationship(back_populates="best")
-    comments: Mapped[list["ResultComment"]] = relationship(back_populates="result")
-
-
-
+    suggestion: Mapped["Suggestion"] = relationship(
+        back_populates="best",
+    )
+    comments: Mapped[list["ResultComment"]] = relationship(
+        back_populates="result",
+    )

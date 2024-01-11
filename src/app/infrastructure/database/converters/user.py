@@ -35,10 +35,18 @@ def convert_user_create_dto_to_db_model(user_dto: dto.UserCreate) -> UserModel:
     )
 
 
-def update_user_fields(existing_user: dto.User, user_update_dto: dto.UserUpdate) -> UserModel:
+def update_user_fields(
+        existing_user: dto.User, user_update_dto: dto.UserUpdate,
+) -> UserModel:
     result_model = UserModel()
     for field in fields(existing_user):
         existing_field_value = getattr(existing_user, field.name)
-        new_value = getattr(user_update_dto, field.name) if hasattr(user_update_dto, field.name) else None
-        setattr(result_model, field.name, new_value if new_value is not None else existing_field_value)
+
+        if hasattr(user_update_dto, field.name):
+            new_value = getattr(user_update_dto, field.name)
+        else:
+            new_value = None
+
+        settable_value = new_value if new_value is not None else existing_field_value
+        setattr(result_model, field.name, settable_value)
     return result_model

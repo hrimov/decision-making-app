@@ -6,7 +6,7 @@ from typing import AsyncGenerator, Generator
 import aioboto3
 import pytest
 import pytest_asyncio
-from testcontainers.minio import MinioContainer
+from testcontainers.minio import MinioContainer  # type: ignore[import-untyped]
 
 from src.app.infrastructure.object_storage.gateway import ObjectStorageGatewayImpl
 
@@ -20,7 +20,7 @@ def minio_container() -> Generator[MinioContainer, None, None]:
         access_key="access_key",
         secret_key="secret_key",
     )
-    if os.name == "nt":  # Note: workaround from testcontainers/testcontainers-python#108
+    if os.name == "nt":  # Note: from testcontainers/testcontainers-python#108
         minio_container.get_container_host_ip = lambda: "localhost"
     try:
         minio_container.start()
@@ -33,9 +33,9 @@ def minio_container() -> Generator[MinioContainer, None, None]:
 
 
 # noinspection PyUnusedLocal
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture()
 async def aioboto_session(
-        minio_container: MinioContainer
+        minio_container: MinioContainer,
 ) -> AsyncGenerator[aioboto3.Session, None]:
     yield aioboto3.Session(
         aws_access_key_id="access_key",
@@ -44,7 +44,7 @@ async def aioboto_session(
     )
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture()
 async def object_storage_gateway(
         minio_container: MinioContainer,
         aioboto_session: aioboto3.Session,
@@ -63,13 +63,13 @@ async def object_storage_gateway(
     minio_client.remove_objects(bucket_name=BUCKET_NAME, delete_object_list=objs)
 
 
-@pytest.fixture
-def file_object_to_upload() -> Generator[io.BytesIO, None, None]:
-    yield io.BytesIO(b"Some binary data")
+@pytest.fixture()
+def file_object_to_upload() -> io.BytesIO:
+    return io.BytesIO(b"Some binary data")
 
 
 # noinspection PyProtectedMember
-@pytest.fixture
+@pytest.fixture()
 def file_to_upload() -> Generator[tempfile._TemporaryFileWrapper, None, None]:
     with tempfile.NamedTemporaryFile(delete=False, mode="wb") as file:
         file.write(b"Some binary data")

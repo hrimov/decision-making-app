@@ -23,13 +23,27 @@ class Problem(CreatedUpdatedAtMixin):
     private: Mapped[bool]
     state_id: Mapped[int] = mapped_column(ForeignKey("problem_states.id"))
 
-    state: Mapped["ProblemState"] = relationship(back_populates="problems")
-    creator: Mapped["User"] = relationship(back_populates="created_problems")
-    problem_members: Mapped[list["ProblemMember"]] = relationship(back_populates="problem")
-    problem_statement: Mapped["ProblemStatement"] = relationship(back_populates="problem")
-    suggestion_stage: Mapped["SuggestionStage"] = relationship(back_populates="problem")
-    suggestions: Mapped[list["Suggestion"]] = relationship(back_populates="problem")
-    voting_stage: Mapped["VotingStage"] = relationship(back_populates="problem")
+    state: Mapped["ProblemState"] = relationship(
+        back_populates="problems",
+    )
+    creator: Mapped["User"] = relationship(
+        back_populates="created_problems",
+    )
+    problem_members: Mapped[list["ProblemMember"]] = relationship(
+        back_populates="problem",
+    )
+    problem_statement: Mapped["ProblemStatement"] = relationship(
+        back_populates="problem",
+    )
+    suggestion_stage: Mapped["SuggestionStage"] = relationship(
+        back_populates="problem",
+    )
+    suggestions: Mapped[list["Suggestion"]] = relationship(
+        back_populates="problem",
+    )
+    voting_stage: Mapped["VotingStage"] = relationship(
+        back_populates="problem",
+    )
 
 
 class ProblemState(BaseModel):
@@ -38,4 +52,6 @@ class ProblemState(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(20))
 
-    problems: Mapped[list["Problem"]] = relationship(back_populates="state")
+    problems: Mapped[list["Problem"]] = relationship(
+        back_populates="state",
+    )

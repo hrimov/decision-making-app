@@ -40,8 +40,7 @@ testcontainers-minio = "^0.0.1rc1"  # for now its a separate package, in future 
 optional = true
 
 [tool.poetry.group.lint.dependencies]
-flake8 = "^6.1.0"
-isort = "^5.12.0"
+ruff = "^0.1.11"
 mypy = "^1.5.1"
 
 
@@ -49,6 +48,20 @@ mypy = "^1.5.1"
 pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+addopts = "-vv --order-scope=module"
+
+
+[tool.mypy]
+explicit_package_bases = true
+
+
+[tool.ruff]
+select = ["ALL"]
+ignore = ["A003", "ANN", "D", "FA100", "FA102", "FIX", "I", "PGH003", "PGH004", "TD"]
+
+[tool.ruff.extend-per-file-ignores]
+"src/app/infrastructure/database/migrations/versions/*" = ["ALL"]
+"tests/*" = ["ARG001", "F401", "PT003", "PT004", "S"]
 
 
 [build-system]
