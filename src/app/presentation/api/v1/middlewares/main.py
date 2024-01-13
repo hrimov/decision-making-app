@@ -1,5 +1,5 @@
 from fastapi import FastAPI
 
 
-def setup(app: FastAPI) -> None:
+def setup(app: FastAPI) -> None:  # noqa
     ...

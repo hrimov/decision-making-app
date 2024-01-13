@@ -11,7 +11,7 @@ from src.app.application.user.dto import (
     User as UserDTO,
     Users as UsersDTO,
     UserCreate as UserCreateDTO,
-    UserUpdate as UserUpdateDTO
+    UserUpdate as UserUpdateDTO,
 )
 from src.app.infrastructure.database.gateways.user import UserGatewayImpl
 
@@ -64,7 +64,9 @@ async def test_get_user_by_nickname(
     async with session.begin():
         await user_gateway.create_user(user_to_create)
 
-    user_dto: UserDTO = await user_gateway.get_user_by_nickname(user_to_create.nickname)
+    user_dto: UserDTO = await user_gateway.get_user_by_nickname(
+        user_to_create.nickname,
+    )
 
     assert user_dto.nickname == user_to_create.nickname
     assert user_dto.fullname == user_to_create.fullname
@@ -96,12 +98,15 @@ async def test_get_users(
     insert_users_count: int = 10
 
     async with session.begin():
-        for i in range(insert_users_count):
+        for _ in range(insert_users_count):
             await user_gateway.create_user(user_to_create)
 
     filters = UserFilters()
     pagination = LimitOffsetPagination()
-    result: UsersDTO = await user_gateway.get_users(filters=filters, pagination=pagination)
+    result: UsersDTO = await user_gateway.get_users(
+        filters=filters,
+        pagination=pagination,
+    )
 
     assert result.pagination.total == insert_users_count
     assert len(result.data) == insert_users_count
@@ -117,35 +122,45 @@ async def test_get_users_order(
     limit: int = 5
 
     async with session.begin():
-        for i in range(insert_users_count):
+        for _ in range(insert_users_count):
             await user_gateway.create_user(user_to_create)
 
     filters = UserFilters()
     pagination = LimitOffsetPagination(limit=5, order=SortOrder.DESC)
-    result: UsersDTO = await user_gateway.get_users(filters=filters, pagination=pagination)
+    result: UsersDTO = await user_gateway.get_users(
+        filters=filters,
+        pagination=pagination,
+    )
 
     assert result.pagination.total == insert_users_count
     assert len(result.data) == limit
 
     # check every ID will be smaller than previous one
     assert reduce(
-        lambda previous, current: (previous[0] and previous[1].id < current.id, current),
+        lambda previous, current: (
+            previous[0] and previous[1].id < current.id, current,
+        ),
         result.data,
-        (True, result.data[0])
+        (True, result.data[0]),
     )
 
     filters = UserFilters()
     pagination = LimitOffsetPagination(limit=5, order=SortOrder.ASC)
-    result: UsersDTO = await user_gateway.get_users(filters=filters, pagination=pagination)
+    another_result: UsersDTO = await user_gateway.get_users(
+        filters=filters,
+        pagination=pagination,
+    )
 
-    assert result.pagination.total == insert_users_count
-    assert len(result.data) == limit
+    assert another_result.pagination.total == insert_users_count
+    assert len(another_result.data) == limit
 
     # check every ID will be bigger than previous one
     assert reduce(
-        lambda previous, current: (previous[0] and previous[1].id > current.id, current),
-        result.data,
-        (True, result.data[0])
+        lambda previous, current: (
+            previous[0] and previous[1].id > current.id, current,
+        ),
+        another_result.data,
+        (True, another_result.data[0]),
     )
 
 
@@ -160,13 +175,16 @@ async def test_get_users_limit_offset(
     offset: int = 3
 
     async with session.begin():
-        for i in range(insert_users_count):
+        for _ in range(insert_users_count):
             await user_gateway.create_user(user_to_create)
 
     filters = UserFilters()
     pagination = LimitOffsetPagination(limit=limit, offset=offset, order=SortOrder.ASC)
-    result: UsersDTO = await user_gateway.get_users(filters=filters, pagination=pagination)
+    result: UsersDTO = await user_gateway.get_users(
+        filters=filters,
+        pagination=pagination,
+    )
 
     assert result.pagination.total == insert_users_count
     assert len(result.data) == limit
-    assert all([user.id == offset + i for i, user in enumerate(result.data, 1)])
+    assert all(user.id == offset + i for i, user in enumerate(result.data, 1))

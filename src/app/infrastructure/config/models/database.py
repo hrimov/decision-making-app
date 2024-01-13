@@ -19,5 +19,5 @@ class DatabaseConfig:
         return "{}+{}://{}:{}@{}:{}/{}".format(
             self.rdbms, self.connector,
             self.user, self.password,
-            self.host, self.port, self.database
+            self.host, self.port, self.database,
         )

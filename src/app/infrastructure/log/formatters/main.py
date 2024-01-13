@@ -1,4 +1,5 @@
 import logging
+from typing import ClassVar, Dict
 
 
 class MainConsoleFormatter(logging.Formatter):
@@ -9,7 +10,7 @@ class MainConsoleFormatter(logging.Formatter):
     RESET = "\x1b[0m"
     FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 
-    FORMATS = {
+    FORMATS: ClassVar[Dict[int, str]] = {
         logging.DEBUG: GREY + FORMAT + RESET,
         logging.INFO: GREEN + FORMAT + RESET,
         logging.WARNING: YELLOW + FORMAT + RESET,

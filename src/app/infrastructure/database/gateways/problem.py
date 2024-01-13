@@ -4,7 +4,11 @@ from sqlalchemy import func, select, Select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.application.common.pagination import LimitOffsetPagination, LimitOffsetPaginationResult, SortOrder
+from src.app.application.common.pagination import (
+    LimitOffsetPagination,
+    LimitOffsetPaginationResult,
+    SortOrder,
+)
 from src.app.application.common.exceptions import DatabaseGatewayError
 from src.app.application.problem import dto
 from src.app.application.problem.filters import ProblemFilters, ProblemStateFilters
@@ -30,13 +34,17 @@ from .base import SQLAlchemyGateway
 
 class ProblemMemberGatewayImpl(SQLAlchemyGateway):
     def _parse_error(self, error: DBAPIError) -> NoReturn:
-        ...
+        raise NotImplementedError
 
 
 class ProblemStateGatewayImpl(SQLAlchemyGateway):
     @exception_mapper
-    async def create_problem_state(self, problem_state_dto: dto.ProblemStateCreate) -> dto.ProblemState:
-        database_problem_state: ProblemStateModel = convert_problem_state_create_dto_to_db_model(problem_state_dto)
+    async def create_problem_state(
+            self, problem_state_dto: dto.ProblemStateCreate,
+    ) -> dto.ProblemState:
+        database_problem_state = convert_problem_state_create_dto_to_db_model(
+            problem_state_dto,
+        )
         self.session.add(database_problem_state)
 
         try:
@@ -48,7 +56,9 @@ class ProblemStateGatewayImpl(SQLAlchemyGateway):
 
     @exception_mapper
     async def get_problem_state_by_id(self, id_: int) -> dto.ProblemState:
-        problem_state: ProblemStateModel | None = await self.session.get(ProblemStateModel, id_)
+        problem_state: ProblemStateModel | None = await self.session.get(
+            ProblemStateModel, id_,
+        )
 
         if problem_state is None:
             raise ProblemStateIdNotExists(id_)
@@ -69,39 +79,46 @@ class ProblemStateGatewayImpl(SQLAlchemyGateway):
     async def get_problem_states(
             self,
             filters: ProblemStateFilters,
-            pagination: LimitOffsetPagination
+            pagination: LimitOffsetPagination,
     ) -> dto.ProblemStates:
         statement = select(ProblemStateModel)
         statement = self._apply_filters(statement, filters)
         statement = self._apply_pagination(statement, pagination)
 
         result: Iterable[ProblemStateModel] = await self.session.scalars(statement)
-        problem_states = [convert_db_model_to_problem_state_dto(problem_state) for problem_state in result]
+        problem_states = [
+            convert_db_model_to_problem_state_dto(problem_state)
+            for problem_state in result
+        ]
         problem_states_count = await self._get_problem_states_count(filters)
-        return dto.Problems(
+        return dto.ProblemStates(
             data=problem_states,
-            pagination=LimitOffsetPaginationResult.from_pagination(pagination, total=problem_states_count)
+            pagination=LimitOffsetPaginationResult.from_pagination(
+                pagination, total=problem_states_count,
+            ),
         )
 
-    def _apply_filters(self, statement: Select, filters: ProblemStateFilters) -> Select:
-        ...
+    # noinspection PyMethodMayBeStatic
+    def _apply_filters(self, statement: Select, filters: ProblemStateFilters) -> Select:  # noqa
+        return statement
 
-    def _apply_pagination(self, statement: Select, pagination: LimitOffsetPagination) -> Select:
-        ...
+    # noinspection PyMethodMayBeStatic
+    def _apply_pagination(self, statement: Select, pagination: LimitOffsetPagination) -> Select:  # noqa
+        return statement
 
     def _parse_error(self, error: DBAPIError) -> NoReturn:
-        ...
+        raise NotImplementedError
 
     async def _get_problem_states_count(self, filters: ProblemStateFilters) -> int:
         statement = select(func.count(ProblemStateModel.id))
         statement = self._apply_filters(statement, filters)
-        problem_states_count: int = await self.session.scalar(statement)
-        return problem_states_count
+        problem_states_count: int | None = await self.session.scalar(statement)
+        return problem_states_count if problem_states_count is not None else 0
 
 
 class ProblemGatewayImpl(SQLAlchemyGateway):
     def __init__(self, session: AsyncSession):
-        super(ProblemGatewayImpl, self).__init__(session=session)
+        super().__init__(session=session)
 
         self.state_gateway = ProblemStateGatewayImpl(session)
         self.member_gateway = ProblemMemberGatewayImpl(session)
@@ -116,7 +133,9 @@ class ProblemGatewayImpl(SQLAlchemyGateway):
         return convert_db_model_to_problem_dto(problem)
 
     @exception_mapper
-    async def get_problems(self, filters: ProblemFilters, pagination: LimitOffsetPagination) -> dto.Problems:
+    async def get_problems(
+            self, filters: ProblemFilters, pagination: LimitOffsetPagination,
+    ) -> dto.Problems:
         statement = select(ProblemModel)
         statement = self._apply_filters(statement, filters)
         statement = self._apply_pagination(statement, pagination)
@@ -126,7 +145,9 @@ class ProblemGatewayImpl(SQLAlchemyGateway):
         problems_count = await self._get_problems_count(filters)
         return dto.Problems(
             data=problems,
-            pagination=LimitOffsetPaginationResult.from_pagination(pagination, total=problems_count)
+            pagination=LimitOffsetPaginationResult.from_pagination(
+                pagination, total=problems_count,
+            ),
         )
 
     @exception_mapper
@@ -143,9 +164,9 @@ class ProblemGatewayImpl(SQLAlchemyGateway):
 
     @exception_mapper
     async def update_problem(self, problem_dto: dto.ProblemUpdate) -> dto.Problem:
-        existing_problem: dto.Problem = await self.get_problem_by_id(problem_dto.id)
+        existing_problem_dto: dto.Problem = await self.get_problem_by_id(problem_dto.id)
         existing_problem: ProblemModel = update_problem_fields(
-            existing_problem=existing_problem,
+            existing_problem=existing_problem_dto,
             problem_update_dto=problem_dto,
         )
 
@@ -165,11 +186,13 @@ class ProblemGatewayImpl(SQLAlchemyGateway):
 
     # noinspection PyMethodMayBeStatic
     # TODO: implement necessary filters for the Problem
-    def _apply_filters(self, statement: Select, filters: ProblemFilters) -> Select:
+    def _apply_filters(self, statement: Select, filters: ProblemFilters) -> Select:  # noqa
         return statement
 
     # noinspection PyMethodMayBeStatic
-    def _apply_pagination(self, statement: Select, pagination: LimitOffsetPagination) -> Select:
+    def _apply_pagination(
+            self, statement: Select, pagination: LimitOffsetPagination,
+    ) -> Select:
         if pagination.order is SortOrder.ASC:
             statement = statement.order_by(ProblemModel.id.asc())
         else:
@@ -185,5 +208,5 @@ class ProblemGatewayImpl(SQLAlchemyGateway):
     async def _get_problems_count(self, filters: ProblemFilters) -> int:
         statement = select(func.count(ProblemModel.id))
         statement = self._apply_filters(statement, filters)
-        problems_count: int = await self.session.scalar(statement)
-        return problems_count
+        problems_count: int | None = await self.session.scalar(statement)
+        return problems_count if problems_count is not None else 0

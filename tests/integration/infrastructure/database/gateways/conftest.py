@@ -4,7 +4,7 @@ from src.app.application.problem.dto import ProblemCreate
 from src.app.application.user.dto import UserCreate
 
 
-@pytest.fixture
+@pytest.fixture()
 def problem_to_create() -> ProblemCreate:
     return ProblemCreate(
         title="title",
@@ -15,7 +15,7 @@ def problem_to_create() -> ProblemCreate:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def user_to_create() -> UserCreate:
     return UserCreate(
         nickname="nickname",

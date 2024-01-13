@@ -3,7 +3,11 @@ from typing import Iterable, NoReturn
 from sqlalchemy import func, select, Select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
-from src.app.application.common.pagination import LimitOffsetPagination, LimitOffsetPaginationResult, SortOrder
+from src.app.application.common.pagination import (
+    LimitOffsetPagination,
+    LimitOffsetPaginationResult,
+    SortOrder,
+)
 from src.app.application.common.exceptions import DatabaseGatewayError
 from src.app.application.user import dto
 from src.app.application.user.exceptions import (
@@ -43,7 +47,9 @@ class UserGatewayImpl(SQLAlchemyGateway):
         return convert_db_model_to_user_dto(user)
 
     @exception_mapper
-    async def get_users(self, filters: UserFilters, pagination: LimitOffsetPagination) -> dto.Users:
+    async def get_users(
+            self, filters: UserFilters, pagination: LimitOffsetPagination,
+    ) -> dto.Users:
         statement = select(UserModel)
         statement = self._apply_filters(statement, filters)
         statement = self._apply_pagination(statement, pagination)
@@ -53,7 +59,9 @@ class UserGatewayImpl(SQLAlchemyGateway):
         users_count = await self._get_users_count(filters)
         return dto.Users(
             data=users,
-            pagination=LimitOffsetPaginationResult.from_pagination(pagination, total=users_count)
+            pagination=LimitOffsetPaginationResult.from_pagination(
+                pagination, total=users_count,
+            ),
         )
 
     @exception_mapper
@@ -71,17 +79,17 @@ class UserGatewayImpl(SQLAlchemyGateway):
     @exception_mapper
     async def update_user(self, user_dto: dto.UserUpdate) -> dto.User:
         existing_user: dto.User = await self.get_user_by_id(user_dto.id)
-        existing_user: UserModel = update_user_fields(
+        updated_user: UserModel = update_user_fields(
             existing_user=existing_user,
             user_update_dto=user_dto,
         )
 
         try:
-            await self.session.merge(existing_user)
+            await self.session.merge(updated_user)
         except IntegrityError as error:
             self._parse_error(error)
 
-        return convert_db_model_to_user_dto(existing_user)
+        return convert_db_model_to_user_dto(updated_user)
 
     # noinspection PyMethodMayBeStatic
     # TODO: implement proper error handling
@@ -92,11 +100,13 @@ class UserGatewayImpl(SQLAlchemyGateway):
 
     # noinspection PyMethodMayBeStatic
     # TODO: implement necessary filters for the User
-    def _apply_filters(self, statement: Select, filters: UserFilters) -> Select:
+    def _apply_filters(self, statement: Select, filters: UserFilters) -> Select:  # noqa
         return statement
 
     # noinspection PyMethodMayBeStatic
-    def _apply_pagination(self, statement: Select, pagination: LimitOffsetPagination) -> Select:
+    def _apply_pagination(
+            self, statement: Select, pagination: LimitOffsetPagination,
+    ) -> Select:
         if pagination.order is SortOrder.ASC:
             statement = statement.order_by(UserModel.id.asc())
         else:
@@ -112,5 +122,5 @@ class UserGatewayImpl(SQLAlchemyGateway):
     async def _get_users_count(self, filters: UserFilters) -> int:
         statement = select(func.count(UserModel.id))
         statement = self._apply_filters(statement, filters)
-        users_count: int = await self.session.scalar(statement)
-        return users_count
+        users_count: int | None = await self.session.scalar(statement)
+        return users_count if users_count is not None else 0

@@ -17,7 +17,9 @@ class UserGateway(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_users(self, filters: UserFilters, pagination: Pagination) -> dto.Users:
+    async def get_users(
+            self, filters: UserFilters, pagination: Pagination,
+    ) -> dto.Users:
         raise NotImplementedError
 
     @abc.abstractmethod

@@ -8,7 +8,10 @@ DEFAULT_LOGGING_LEVEL: int = logging.INFO
 
 
 def configure_logging(config: AppConfig) -> None:
-    logging_level: int = config.logging_level if config.logging_level else DEFAULT_LOGGING_LEVEL
+    if config.logging_level:
+        logging_level: int = logging.getLevelName(config.logging_level)
+    else:
+        logging_level = DEFAULT_LOGGING_LEVEL
 
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging_level)

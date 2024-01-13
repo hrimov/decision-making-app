@@ -1,4 +1,4 @@
-class ApplicationException(Exception):
+class ApplicationException(Exception):  # noqa: N818
     """Base application exception"""
 
     @property

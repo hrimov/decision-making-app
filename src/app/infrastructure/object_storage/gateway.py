@@ -12,9 +12,9 @@ class ObjectStorageGatewayImpl(AIOBotoGateway):
             self,
             session: aioboto3.Session,
             bucket_name: str,
-            endpoint_url: str | None = None
+            endpoint_url: str | None = None,
     ) -> None:
-        super(ObjectStorageGatewayImpl, self).__init__(session=session)
+        super().__init__(session=session)
         self.bucket_name = bucket_name
         self.bucket: Bucket | None = None
 
@@ -50,10 +50,11 @@ class ObjectStorageGatewayImpl(AIOBotoGateway):
 
     async def get_file_presigned_url(self, name: str, expires_in: int = 3_600) -> str:
         async with self.s3_client_context as s3_client:
-            url = await s3_client.generate_presigned_url(
-                "get_object", Params={"Bucket": self.bucket_name, "Key": name}, ExpiresIn=expires_in
+            return await s3_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": self.bucket_name, "Key": name},
+                ExpiresIn=expires_in,
             )
-            return url
 
     async def get_file_object(self, name: str) -> io.BytesIO:
         async with self.s3_resource_context as s3_resource:
