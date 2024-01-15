@@ -25,7 +25,7 @@ jobs:
           cache: "poetry"
           cache-dependency-path: poetry.lock
       - name: Install dependencies
-        run: poetry install --only lint
+        run: poetry install --with lint, test
       - name: Lint with ruff
         run: poetry run ruff check
       - name: Lint with mypy
