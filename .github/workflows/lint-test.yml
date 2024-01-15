@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ master, dev, ]
   push:
-    branches: [ master, dev, feature/continuous-integration, ]
+    branches: [ master, dev, ]
 
 jobs:
   lint:
@@ -25,7 +25,7 @@ jobs:
           cache: "poetry"
           cache-dependency-path: poetry.lock
       - name: Install dependencies
-        run: poetry install --with lint, test
+        run: poetry install --with lint,test
       - name: Lint with ruff
         run: poetry run ruff check
       - name: Lint with mypy
