@@ -1,0 +1,50 @@
+# Linters & tests running workflow
+
+name: Decision Making Application
+
+on:
+
+  workflow_call:
+
+  pull_request:
+    branches: [ master, dev, ]
+  push:
+    branches: [ master, dev, feature/continuous-integration, ]
+
+jobs:
+  lint:
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: poetry.lock
+      - name: Install dependencies
+        run: poetry install --only lint
+      - name: Lint with ruff
+        run: poetry run ruff check
+      - name: Lint with mypy
+        run: poetry run mypy .
+  test:
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: poetry.lock
+      - name: Install dependencies
+        run: poetry install --with test
+      - name: Test with pytest
+        run: poetry run pytest
