@@ -6,6 +6,7 @@ from src.app.infrastructure.config.models import (
     Config,
     DatabaseConfig,
     ObjectStorageConfig,
+    RabbitMQConnectorConfig,
 )
 
 
@@ -22,6 +23,7 @@ def load_config(path: str | None = None) -> Config:
     application_data = parser["application"]
     database_data = parser["database"]
     object_storage_data = parser["object_storage"]
+    rmq_connector_data = parser["rmq_connector"]
 
     application_config = AppConfig(
         host=application_data.get("host"),
@@ -41,5 +43,19 @@ def load_config(path: str | None = None) -> Config:
         secret_key=object_storage_data.get("secret_key"),
         bucket_name=object_storage_data.get("bucket_name"),
     )
+    rmq_connector_config = RabbitMQConnectorConfig(
+        host=rmq_connector_data.get("host"),
+        port=rmq_connector_data.get("port"),
+        username=rmq_connector_data.get("username"),
+        password=rmq_connector_data.get("password"),
+        connection_pool_max_size=rmq_connector_data.getint("connection_pool_max_size"),
+        channel_pool_max_size=rmq_connector_data.getint("channel_pool_max_size"),
+        default_exchange_name=rmq_connector_data.get("default_exchange_name"),
+    )
 
-    return Config(application_config, database_config, object_storage_config)
+    return Config(
+        application_config,
+        database_config,
+        object_storage_config,
+        rmq_connector_config,
+    )
