@@ -2,7 +2,7 @@ from .application import AppConfig
 from .database import DatabaseConfig
 from .main import Config
 from .object_storage import ObjectStorageConfig
-from .rmq_connector import RabbitMQConnectorConfig
+from .message_queue import MessageQueueConfig
 
 
 __all__ = [
@@ -10,5 +10,5 @@ __all__ = [
     "Config",
     "DatabaseConfig",
     "ObjectStorageConfig",
-    "RabbitMQConnectorConfig",
+    "MessageQueueConfig",
 ]
