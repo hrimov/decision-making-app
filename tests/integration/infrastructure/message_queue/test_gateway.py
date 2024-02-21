@@ -6,36 +6,36 @@ from aio_pika import Queue, Exchange
 from aio_pika.abc import AbstractIncomingMessage
 from aiormq import ChannelNotFoundEntity
 
-from src.app.infrastructure.rmq_connector.gateway import RabbitMQConnectorGatewayImpl
+from src.app.infrastructure.message_queue.gateway import MessageQueueGatewayImpl
 
 
 @pytest.mark.order(1)
-async def test_declare_exchange(rmq_connector_gateway: RabbitMQConnectorGatewayImpl):
+async def test_declare_exchange(message_queue_gateway: MessageQueueGatewayImpl):
     exchange_name = str(uuid4())
-    await rmq_connector_gateway.create_exchange(exchange_name)
+    await message_queue_gateway.create_exchange(exchange_name)
 
-    async with rmq_connector_gateway.channel_pool.acquire() as channel:
+    async with message_queue_gateway.channel_pool.acquire() as channel:
         exchange = await channel.get_exchange(name=exchange_name, ensure=True)
     assert exchange.name == exchange_name
 
 
 @pytest.mark.order(2)
-async def test_declare_queue(rmq_connector_gateway: RabbitMQConnectorGatewayImpl):
+async def test_declare_queue(message_queue_gateway: MessageQueueGatewayImpl):
     queue_name = str(uuid4())
-    await rmq_connector_gateway.create_queue(queue_name)
+    await message_queue_gateway.create_queue(queue_name)
 
-    async with rmq_connector_gateway.channel_pool.acquire() as channel:
+    async with message_queue_gateway.channel_pool.acquire() as channel:
         queue = await channel.get_queue(name=queue_name, ensure=True)
     assert queue.name == queue_name
 
 
 @pytest.mark.order(3)
 async def test_bid_queue(
-    rmq_connector_gateway: RabbitMQConnectorGatewayImpl,
-    queue: Queue,
-    exchange: Exchange,
+        message_queue_gateway: MessageQueueGatewayImpl,
+        queue: Queue,
+        exchange: Exchange,
 ):
-    bis_success = await rmq_connector_gateway.bid_queue(
+    bis_success = await message_queue_gateway.bid_queue(
         queue_name=queue.name,
         exchange_name=exchange.name,
         routing_key="some-routing-key",
@@ -45,21 +45,21 @@ async def test_bid_queue(
 
 @pytest.mark.order(4)
 async def test_publish_message(
-    rmq_connector_gateway: RabbitMQConnectorGatewayImpl, exchange: Exchange,
+        message_queue_gateway: MessageQueueGatewayImpl, exchange: Exchange,
 ):
     message = {"some": "some_value"}
-    await rmq_connector_gateway.publish(
+    await message_queue_gateway.publish(
         message, routing_key="some_key", exchange_name=exchange.name,
     )
 
 
 @pytest.mark.order(5)
 async def test_publish_not_exist_exchange(
-    rmq_connector_gateway: RabbitMQConnectorGatewayImpl,
+        message_queue_gateway: MessageQueueGatewayImpl,
 ):
     exchange_name = "not_real_exchange"
     with pytest.raises(ChannelNotFoundEntity) as e:
-        await rmq_connector_gateway.publish(
+        await message_queue_gateway.publish(
             {"some": "value"}, routing_key="some_key", exchange_name=exchange_name,
         )
 
@@ -68,17 +68,17 @@ async def test_publish_not_exist_exchange(
 
 @pytest.mark.order(6)
 async def test_consume_message(
-    rmq_connector_gateway: RabbitMQConnectorGatewayImpl,
-    queue: Queue,
-    exchange: Exchange,
+        message_queue_gateway: MessageQueueGatewayImpl,
+        queue: Queue,
+        exchange: Exchange,
 ):
     routing_key = str(uuid4())
     message_body = {"some": "some_value"}
     consumed = False
-    await rmq_connector_gateway.bid_queue(
+    await message_queue_gateway.bid_queue(
         queue_name=queue.name, routing_key=routing_key, exchange_name=exchange.name,
     )
-    await rmq_connector_gateway.publish(
+    await message_queue_gateway.publish(
         message_body, routing_key=routing_key, exchange_name=exchange.name,
     )
 
@@ -91,7 +91,7 @@ async def test_consume_message(
             await message.ack()
             return True
 
-    await rmq_connector_gateway.consume(
+    await message_queue_gateway.consume(
         queue_name=queue.name, callback=consume_callback,
     )
 
@@ -101,10 +101,13 @@ async def test_consume_message(
 
 @pytest.mark.order(7)
 async def test_consume_not_exist_queue(
-    rmq_connector_gateway: RabbitMQConnectorGatewayImpl,
+        message_queue_gateway: MessageQueueGatewayImpl,
 ):
     queue_name = "NotExistName"
     with pytest.raises(ChannelNotFoundEntity) as e:
-        await rmq_connector_gateway.consume(queue_name=queue_name, callback=lambda m: m)  # type: ignore
+        await message_queue_gateway.consume(
+            queue_name=queue_name,
+            callback=lambda m: m,  # type: ignore
+        )
 
     assert str(e.value) == f"NOT_FOUND - no queue '{queue_name}' in vhost '/'"
