@@ -8,7 +8,7 @@ import pytest
 import pytest_asyncio
 from testcontainers.minio import MinioContainer  # type: ignore[import-untyped]
 
-from src.app.infrastructure.object_storage.gateway import ObjectStorageGatewayImpl
+from dma.infrastructure.object_storage.gateway import ObjectStorageGatewayImpl
 
 
 BUCKET_NAME: str = "bucket-name"

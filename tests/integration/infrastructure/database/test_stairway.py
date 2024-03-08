@@ -7,7 +7,7 @@ from alembic.script import Script, ScriptDirectory
 def get_revisions(alembic_config: AlembicConfig) -> list[Script]:
     # Get directory object with Alembic migrations
     script_location = alembic_config.get_main_option(
-        "script_location", default="./src/app/infrastructure/database/migrations",
+        "script_location", default="./src/dma/infrastructure/database/migrations",
     )
     revisions_dir = ScriptDirectory(script_location)
 

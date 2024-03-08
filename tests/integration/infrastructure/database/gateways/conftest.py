@@ -1,7 +1,7 @@
 import pytest
 
-from src.app.application.problem.dto import ProblemCreate
-from src.app.application.user.dto import UserCreate
+from dma.application.problem.dto import ProblemCreate
+from dma.application.user.dto import UserCreate
 
 
 @pytest.fixture()

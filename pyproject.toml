@@ -5,11 +5,11 @@ description = ""
 authors = ["hrimov <andrew.hrimov@gmail.com>"]
 readme = "README.md"
 packages = [
-    { include = "app", from = "src" }
+    { include = "dma", from = "src" }
 ]
 
 [tool.poetry.scripts]
-api = "src.app.__main__:run"
+api = "src.dma.__main__:run"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -50,16 +50,12 @@ asyncio_mode = "auto"
 addopts = "-vv --order-scope=module"
 
 
-[tool.mypy]
-explicit_package_bases = true
-
-
 [tool.ruff]
 select = ["ALL"]
 ignore = ["A003", "ANN", "D", "FA100", "FA102", "FIX", "I", "PGH003", "PGH004", "TD"]
 
 [tool.ruff.extend-per-file-ignores]
-"src/app/infrastructure/database/migrations/versions/*" = ["ALL"]
+"src/dma/infrastructure/database/migrations/versions/*" = ["ALL"]
 "tests/*" = ["ARG001", "F401", "PT003", "PT004", "S"]
 
 

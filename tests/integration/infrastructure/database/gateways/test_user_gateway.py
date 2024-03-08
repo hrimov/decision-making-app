@@ -5,15 +5,15 @@ from functools import reduce
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.application.user.filters import UserFilters
-from src.app.application.common.pagination import LimitOffsetPagination, SortOrder
-from src.app.application.user.dto import (
+from dma.application.user.filters import UserFilters
+from dma.application.common.pagination import LimitOffsetPagination, SortOrder
+from dma.application.user.dto import (
     User as UserDTO,
     Users as UsersDTO,
     UserCreate as UserCreateDTO,
     UserUpdate as UserUpdateDTO,
 )
-from src.app.infrastructure.database.gateways.user import UserGatewayImpl
+from dma.infrastructure.database.gateways.user import UserGatewayImpl
 
 
 async def test_create_user(

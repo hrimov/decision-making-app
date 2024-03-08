@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 import pytest
 import pytest_asyncio
 
-from src.app.infrastructure.object_storage.gateway import ObjectStorageGatewayImpl
+from dma.infrastructure.object_storage.gateway import ObjectStorageGatewayImpl
 
 
 @pytest.mark.order("first")
