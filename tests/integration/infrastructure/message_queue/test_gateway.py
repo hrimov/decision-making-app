@@ -6,7 +6,7 @@ from aio_pika import Queue, Exchange
 from aio_pika.abc import AbstractIncomingMessage
 from aiormq import ChannelNotFoundEntity
 
-from src.app.infrastructure.message_queue.gateway import MessageQueueGatewayImpl
+from dma.infrastructure.message_queue.gateway import MessageQueueGatewayImpl
 
 
 @pytest.mark.order(1)

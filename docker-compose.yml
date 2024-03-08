@@ -26,7 +26,7 @@ services:
       - ./config:/decision_making_app/config:ro
     environment:
       CONFIG_PATH: ${CONFIG_PATH:-./config/local.ini}
-    command: [ "python", "-Om", "src.app" ]
+    command: [ "python", "-Om", "dma" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsSL http://localhost:5000/healthcheck/" ]
       interval: 10s
@@ -73,10 +73,10 @@ services:
     volumes:
       - ./config:/decision_making_app/config:ro
       - ./alembic.ini:/decision_making_app/alembic.ini:ro
-      - ./src/app/infrastructure/database/migrations:/decision_making_app/src/app/infrastructure/database/migrations:ro
+      - ./src/dma/infrastructure/database/migrations:/decision_making_app/src/dma/infrastructure/database/migrations:ro
     environment:
       CONFIG_PATH: ${CONFIG_PATH:-./config/local.ini}
-    command: [ "python", "-m", "alembic", "upgrade", "head" ]
+    command: [ "python", "-Om", "alembic", "upgrade", "head" ]
 
   minio:
     profiles: [ "api" ]
@@ -94,11 +94,15 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-decision_making_app_admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-decision_making_app_admin}
     healthcheck:
-      test: [ "CMD-SHELL", "curl -I http://localhost:9000/minio/health/live" ]
-      interval: 10s
-      timeout: 60s
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
       retries: 5
-      start_period: 10s
+#      test: [ "CMD-SHELL", "curl -I http://localhost:9000/minio/health/live" ]
+#      interval: 10s
+#      timeout: 60s
+#      retries: 5
+#      start_period: 10s
 
   rabbitmq:
     profiles: [ "api" ]

@@ -6,8 +6,8 @@ from testcontainers.rabbitmq import RabbitMqContainer # type: ignore[import-unty
 import pytest
 import pytest_asyncio
 
-from src.app.infrastructure.config.models import MessageQueueConfig
-from src.app.infrastructure.message_queue.gateway import MessageQueueGatewayImpl
+from dma.infrastructure.config.models import MessageQueueConfig
+from dma.infrastructure.message_queue.gateway import MessageQueueGatewayImpl
 
 
 @pytest.fixture(scope="session")

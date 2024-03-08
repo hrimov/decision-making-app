@@ -5,19 +5,19 @@ from functools import reduce
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.application.problem.filters import ProblemFilters
-from src.app.application.common.pagination import LimitOffsetPagination, SortOrder
-from src.app.application.problem.dto import (
+from dma.application.problem.filters import ProblemFilters
+from dma.application.common.pagination import LimitOffsetPagination, SortOrder
+from dma.application.problem.dto import (
     Problem as ProblemDTO,
     Problems as ProblemsDTO,
     ProblemCreate as ProblemCreateDTO,
     ProblemUpdate as ProblemUpdateDTO,
 )
-from src.app.application.user.dto import (
+from dma.application.user.dto import (
     UserCreate as UserCreateDTO,
 )
-from src.app.infrastructure.database.gateways.problem import ProblemGatewayImpl
-from src.app.infrastructure.database.gateways.user import UserGatewayImpl
+from dma.infrastructure.database.gateways.problem import ProblemGatewayImpl
+from dma.infrastructure.database.gateways.user import UserGatewayImpl
 
 
 async def test_create_problem(
