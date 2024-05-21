@@ -8,9 +8,6 @@ in `./config/local.ini` without dist-suffix and run
 `poetry install`.
 
 1. Running locally without Docker:\
-   Run `python -Om app`
+   Run `python -Om dma`
 2. Running locally via docker-compose:\
    Run `docker-compose -f docker-compose.yml up -d`
-
-Alternatively, you can install this package in editable-mode via:\
-`pip install -e .`
